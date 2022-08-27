@@ -14,10 +14,17 @@ function NestedComponent() {
     <div></div>
   )
 }
+var firstNonMemoComponentRender = 0;
+var firstMemoComponentRender = 0;
 
 
 function createComponent() {
-  return () => {
+
+  return ({index}) => {
+    if(index == 0) firstNonMemoComponentRender = performance.now();
+    if(index == settings.REACT_APP_N_COMPONENTS - 1) {
+      console.log(`Rendering non memo components took: ${performance.now() - firstNonMemoComponentRender}ms`)
+    }
     const states = [];
     for (var i = 0; i < process.env.REACT_APP_N_STATES; i++) {
       const state = useState();
@@ -137,7 +144,11 @@ function createComponent() {
 }
 
 function createMemoComponent() {
-  return memo(() => {
+  return memo(({index}) => {
+    if(index == 0) firstMemoComponentRender = performance.now();
+    if(index === settings.REACT_APP_N_COMPONENTS - 1) {
+      console.log(`Rendering memo components took: ${performance.now() - firstMemoComponentRender}ms`)
+    }
     const states = [];
     for (var i = 0; i < settings.REACT_APP_N_STATES; i++) {
       const state = useState();
@@ -278,25 +289,14 @@ for (var i = 0; i < settings.REACT_APP_N_COMPONENTS; i++) {
 
 }
 
-console.log(`Creating memo components took: ${performance.now() - startNoMemo}ms`)
+console.log(`Creating memo components took: ${performance.now() - startMemo}ms`)
 console.log(process.env)
+
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     {noMemoComponents.map((C, i)=>(<C index={i}/>))}
+     {memoComponents.map((C, i)=>(<C index={i}/>))}
     </div>
   );
 }
