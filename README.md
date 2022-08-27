@@ -9,7 +9,7 @@ Here are the logs:
 ### Time Performance
 Looks like it took an additional 30ms to render 5,000 memoized components on 6x slowdown in chrome. 
 
-Also notice that the 5,000 memoized components actually rendered 80ms faster for a single render. So it seems that memoing everything blindly, at least in this case, actually led to a net performance gain. That's pretty interesting.
+Also notice that the 5,000 memoized components actually rendered 80ms faster for a single render. So it seems that memoizing everything blindly, at least in this case, actually led to a net performance gain. That's pretty interesting.
 
 #### Interpreting time performance data
 I would interepret this as saying "there's no way a user will feel a time performance hit if I were to blindy memoize every component in my application, any they might get a noticeable performance boost". 5,000 components is way, way, way more than most applications have, and even at 5,000 it was only 30ms on 6x slowdown. That initial memoization time is basically completely negligible.
