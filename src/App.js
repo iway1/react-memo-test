@@ -16,14 +16,20 @@ function NestedComponent() {
 }
 var firstNonMemoComponentRender = 0;
 var firstMemoComponentRender = 0;
+var nonMemoMemoryFirstRender = 0;
+var memoMemoryFirstRender = 0;
 
 
 function createComponent() {
 
   return ({index}) => {
-    if(index == 0) firstNonMemoComponentRender = performance.now();
+    if(index == 0) {
+      firstNonMemoComponentRender = performance.now();
+      nonMemoMemoryFirstRender = window.performance.memory.usedJSHeapSize;
+    }
     if(index == settings.REACT_APP_N_COMPONENTS - 1) {
       console.log(`Rendering non memo components took: ${performance.now() - firstNonMemoComponentRender}ms`)
+      console.log(`And ${window.performance.memory.usedJSHeapSize - nonMemoMemoryFirstRender} bytes`)
     }
     const states = [];
     for (var i = 0; i < process.env.REACT_APP_N_STATES; i++) {
@@ -34,108 +40,6 @@ function createComponent() {
       <>
         <div>
           A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
         </div>
         <NestedComponent />
       </>
@@ -145,9 +49,13 @@ function createComponent() {
 
 function createMemoComponent() {
   return memo(({index}) => {
-    if(index == 0) firstMemoComponentRender = performance.now();
+    if(index == 0) {
+      firstMemoComponentRender = performance.now();
+      memoMemoryFirstRender = window.performance.memory.usedJSHeapSize;
+    }
     if(index === settings.REACT_APP_N_COMPONENTS - 1) {
-      console.log(`Rendering memo components took: ${performance.now() - firstMemoComponentRender}ms`)
+      console.log(`Rendering memo components took: ${performance.now() - firstMemoComponentRender}ms`);
+      console.log(`And ${window.performance.memory.usedJSHeapSize - memoMemoryFirstRender} bytes`)
     }
     const states = [];
     for (var i = 0; i < settings.REACT_APP_N_STATES; i++) {
@@ -158,131 +66,32 @@ function createMemoComponent() {
       <>
         <div>
           A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-        </div>
-        <div>
-          A component
-          <div>
-            A component
-            <div>
-              A component
-              <div>
-                A component
-              </div>
-            </div>
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
-          <div>
-            A component
-          </div>
         </div>
         <NestedComponent />
       </>
     )
-  })
+  }, (oldProps, newProps)=>true)
 }
 console.log(`Running with settings:`)
 console.log(`Number of components: ${settings.REACT_APP_N_COMPONENTS}`)
 console.log(`Number of useState calls per component: ${settings.REACT_APP_N_STATES}`)
 
 console.log(`Creating components (no memo).`)
+const memoryUsageBeforeNoMemoDefinition = window.performance.memory.usedJSHeapSize;
 const startNoMemo = performance.now();
 var noMemoComponents = []
-console.log(process.env)
 for (var i = 0; i < parseInt(settings.REACT_APP_N_COMPONENTS); i++) {
   noMemoComponents.push(createComponent());
 }
 console.log(`Creating no memo components took ${performance.now() - startNoMemo}ms`)
+console.log(`And cost ${window.performance.memory.usedJSHeapSize - memoryUsageBeforeNoMemoDefinition} bytes`)
 
 const startMemo = performance.now();
 var memoComponents = [];
 
 console.log("Creating components (memo)")
+
+const memoryUsageBeforeMemoDefinition = window.performance.memory.usedJSHeapSize;
 
 for (var i = 0; i < settings.REACT_APP_N_COMPONENTS; i++) {
   memoComponents.push(createMemoComponent())
@@ -290,7 +99,7 @@ for (var i = 0; i < settings.REACT_APP_N_COMPONENTS; i++) {
 }
 
 console.log(`Creating memo components took: ${performance.now() - startMemo}ms`)
-console.log(process.env)
+console.log(`And cost ${window.performance.memory.usedJSHeapSize - memoryUsageBeforeMemoDefinition} bytes`)
 
 function App() {
   return (
